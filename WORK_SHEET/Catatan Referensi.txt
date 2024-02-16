@@ -1,0 +1,11 @@
+https://stackoverflow.com/questions/15655820/upgrading-a-varchar-column-to-enum-type-in-postgresql
+https://copyprogramming.com/howto/upgrading-a-varchar-column-to-enum-type-in-postgresql
+https://www.munderwood.ca/index.php/2015/05/28/altering-postgresql-columns-from-one-enum-to-another/
+https://sequelize.org/docs/v6/core-concepts/model-querying-basics/
+https://dev.to/francescoxx/build-a-crud-rest-api-in-javascript-using-nodejs-express-postgres-docker-jkb
+https://www.bezkoder.com/node-express-sequelize-postgresql/
+https://santrikoding.com/cara-mudah-membuat-rest-api-menggunakan-express-js-3-menyiapkan-database
+https://medium.com/javascript-indonesia-community/crud-restfull-api-expressjs-menggunakan-orm-sequelize-dan-mysql-part-1-inisiasi-sequelize-979e1bac6716
+https://sequelize.org/docs/v6/other-topics/migrations/
+https://stackoverflow.com/questions/20386402/sequelize-unknown-column-createdat-in-field-list
+
