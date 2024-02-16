@@ -124,6 +124,28 @@ class EducationController {
             return res.status(500).json({message: 'Error!'})
         }
     }
+
+    static deleteEducation = async (req, res) => {
+        try {
+
+            const employee_id = req.params.employee_id
+
+            const educationData = await EducationModel.findAll({where: {employee_id}})
+
+            if (educationData.length == 0) {
+                return res.status(404).json({message: 'Data not found!'})
+            }
+            else {
+                const deleteEducationData = await EducationModel.destroy({where:{employee_id}})
+
+                return res.status(200).json({message: 'Data Retrived!', deleteEducationData})
+            }
+            
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
  
 }
 

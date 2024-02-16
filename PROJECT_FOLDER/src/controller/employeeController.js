@@ -119,6 +119,29 @@ class EmployeeController {
             return res.status(500).json({message: 'Error!'})
         }
     }
+    
+    static deleteEmployee = async (req, res) => {
+        try {
+            
+            const id = req.params.id
+
+            const employeeData = await EmployeeModel.findAll({where: {id}})
+
+            // Check if data exist
+            if (employeeData.length == 0) {
+                return res.status(404).json({message: `Data not Found!`})
+            }
+            else {
+                const deleteEmployeeData = await EmployeeModel.destroy({where:{id}})
+
+                return res.status(200).json({message:'Data Deleted!', deleteEmployeeData})
+            }
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
 }
 
 module.exports = EmployeeController
