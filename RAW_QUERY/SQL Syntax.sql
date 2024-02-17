@@ -26,18 +26,62 @@ select * from employee_profile;
 select * from employee_family;
 
 
+-- select report
 select e.id as employee_id, nik, e.name, is_active, ep.gender as gender, 
 	age(ep.date_of_birth::date) as umur, ed.name as school_name,
-	ed.level as level, 
+	ed.level as level,
 	case 
-		when relation_status = 'Istri' then '1 Istri' 
-		when relation_status = 'Anak' then '1 Anak' 
-	end family_data
+		when (suami != 0 and anak != 0) then concat(suami, ' suami & ',anak,' anak') 
+		when (istri != 0 and anak != 0) then concat(istri, ' istri & ',anak,' anak')
+		when (suami != 0 and anak = 0) then concat (suami, ' suami')
+		when (istri != 0 and anak = 0) then concat (istri, ' istri')
+		when (suami = 0 or istri = 0) and (anak != 0 ) then concat(anak, ' anak')
+		else '-'
+	end as family_realtion
 from employee e 
 left join employee_profile ep on e.id = ep.employee_id
 left join education ed ON e.id = ed.employee_id
-left join employee_family ef on e.id = ef.employee_id;
+left join (
+		select employee_id, sum(suami) as suami, sum(istri) as istri, sum(anak) as anak
+			
+		from (select employee_id, 
+		case relation_status
+				when 'Suami' then 1
+			else 0
+		end as Suami,
+		case relation_status
+			when 'Istri' then 1
+			else 0
+		end as Istri,
+		case relation_status
+			when 'Anak' then 1
+				else 0
+			end as Anak from employee_family ef) as f
+			group by 1
+	)  as family  on family.employee_id = e.id;
 
+
+
+
+
+
+
+--Testing
+select employee_id, sum(suami) as suami, sum(istri) as istri, sum(anak) as anak	
+from (select employee_id, 
+case relation_status
+		when 'Suami' then 1
+	else 0
+end as Suami,
+case relation_status
+	when 'Istri' then 1
+	else 0
+end as Istri,
+case relation_status
+	when 'Anak' then 1
+		else 0
+	end as Anak from employee_family ef) as f
+	group by 1
 
 
 

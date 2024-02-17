@@ -22,4 +22,8 @@ app.get('/one-employee-family/:employee_id', EmployeeController.getOneEmployeeFa
 app.put('/update-employee-family/:employee_id', EmployeeController.updateEmployeeFamily)
 app.delete('/delete-employee-family/:employee_id', EmployeeController.deleteEmployeeFamily)
 
+app.get('/all-employee-detail', EmployeeController.getEmployeeDetail)
+app.get('/one-employee-detail/:employee_id', EmployeeController.getOneEmployeeDetail)
+app.get('/report', EmployeeController.getReport)
+
 module.exports = app

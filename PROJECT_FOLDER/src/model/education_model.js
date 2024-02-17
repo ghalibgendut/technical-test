@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize')
 const db = require('../../config/db/db.js')
+const EmployeeModel = require('./employee_model.js')
 
 // Define EducationModel
 const EducationModel = db.define('education', {
@@ -39,10 +40,15 @@ const EducationModel = db.define('education', {
 })
 
 // Associate EducationModel with EmployeeModel
-EducationModel.associate = (models) => {
-    EducationModel.belongsTo(models.EmployeeModel, {
-        foreignKey: 'employee_id'
-    })
-}
+// EducationModel.associate = (models) => {
+//     EducationModel.belongsTo(models.EmployeeModel, {
+//         foreignKey: 'employee_id'
+//     })
+// }
+EmployeeModel.hasMany(EducationModel, {
+    foreignKey: 'employee_id'
+})
+
+
 
 module.exports = EducationModel

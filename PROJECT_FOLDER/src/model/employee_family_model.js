@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize')
 const db = require('../../config/db/db.js')
+const EmployeeModel = require('./employee_model.js')
 
 // Define EmployeeFamilyModel
 const EmployeeFamilyModel = db.define('employee_family', {
@@ -40,10 +41,14 @@ const EmployeeFamilyModel = db.define('employee_family', {
 })
 
 // Associate EmployeeFamilyModel with EmployeeModel
-EmployeeFamilyModel.associate = (models) => {
-    EmployeeFamilyModel.belongsTo(models.EmployeeModel, {
-        foreignKey: 'employee_id'
-    });
-};
+// EmployeeFamilyModel.associate = (models) => {
+//     EmployeeFamilyModel.belongsTo(models.EmployeeModel, {
+//         foreignKey: 'employee_id'
+//     })
+// }
+
+EmployeeModel.hasMany(EmployeeFamilyModel, {
+    foreignKey: 'employee_id'
+})
 
 module.exports = EmployeeFamilyModel

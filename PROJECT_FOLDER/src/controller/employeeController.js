@@ -1,12 +1,15 @@
 const EmployeeModel = require('../model/employee_model')
 const EmployeeProfileModel = require('../model/employee_profile_model')
 const EmployeeFamilyModel = require('../model/employee_family_model')
-const Sequelize = require('sequelize')
+const EducationModel = require('../model/education_model')
+const {sequelize} = require('sequelize')
+// const {Op, Sequelize} = require('sequelize')
 const moment = require('moment')
 const path = require('path')
 const sharp = require('sharp')
 const filePath = path.join(__dirname, '../../assets')
 const ValidatorService = require('../service/validatorService')
+const db = require('../../config/db/db.js')
 
 
 class EmployeeController {
@@ -478,6 +481,106 @@ class EmployeeController {
 
                 return res.status(200).json({message:'Data Deleted!', deleteEmployeeFamilyData})
             }
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
+
+    static getEmployeeDetail = async (req, res) => {
+        try {
+
+            const employeeData = await EmployeeModel.findAll({
+                include: [
+                    {model: EmployeeProfileModel},
+                    {model: EducationModel},
+                    {model: EmployeeFamilyModel}
+                ]
+            })
+
+            if (employeeData.length == 0) {
+                return res.status(404).json({message: `Data not Found!`})
+            }
+            else {
+                return res.status(200).json({message: `Data Retrived!`, employeeData})
+            }
+            
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
+
+    static getOneEmployeeDetail = async (req, res) => {
+        try {
+            
+            const employee_id = req.params.employee_id
+
+            const employeeData = await EmployeeModel.findOne({
+                include: [
+                    {model: EmployeeProfileModel},
+                    {model: EducationModel},
+                    {model: EmployeeFamilyModel}
+                ],
+                where: {id: employee_id}
+            })
+
+            if (employeeData.length == 0) {
+                return res.status(404).json({message: `Data not Found!`})
+            }
+            else {
+                return res.status(200).json({message: `Data Retrived!`, employeeData})
+            }
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
+
+    static getReport = async (req, res) => {
+        try {
+            
+            const employeeData = await EmployeeModel.sequelize.query(
+               `
+               select e.id as employee_id, nik, e.name, is_active, ep.gender as gender, 
+               age(ep.date_of_birth::date) as umur, ed.name as school_name,
+               ed.level as level,
+               case 
+                   when (suami != 0 and anak != 0) then concat(suami, ' suami & ',anak,' anak') 
+                   when (istri != 0 and anak != 0) then concat(istri, ' istri & ',anak,' anak')
+                   when (suami != 0 and anak = 0) then concat (suami, ' suami')
+                   when (istri != 0 and anak = 0) then concat (istri, ' istri')
+                   when (suami = 0 or istri = 0) and (anak != 0 ) then concat(anak, ' anak')
+                   else '-'
+               end as family_realtion
+                from employee e 
+                left join employee_profile ep on e.id = ep.employee_id
+                left join education ed ON e.id = ed.employee_id
+                left join (
+                        select employee_id, sum(suami) as suami, sum(istri) as istri, sum(anak) as anak
+                            
+                        from (select employee_id, 
+                        case relation_status
+                                when 'Suami' then 1
+                            else 0
+                        end as Suami,
+                        case relation_status
+                            when 'Istri' then 1
+                            else 0
+                        end as Istri,
+                        case relation_status
+                            when 'Anak' then 1
+                                else 0
+                            end as Anak from employee_family ef) as f
+                            group by 1
+                    )  as family  on family.employee_id = e.id`
+            )
+
+            const dataReport = employeeData[0]
+
+            return res.status(200).json({message:`Data Retrived!`, dataReport})
 
         } catch (error) {
             console.log(error);
