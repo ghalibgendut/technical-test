@@ -1,5 +1,6 @@
 const EmployeeModel = require('../model/employee_model')
 const EmployeeProfileModel = require('../model/employee_profile_model')
+const EmployeeFamilyModel = require('../model/employee_family_model')
 const Sequelize = require('sequelize')
 const moment = require('moment')
 const path = require('path')
@@ -148,6 +149,7 @@ class EmployeeController {
             return res.status(500).json({message: 'Error!'})
         }
     }
+
 
     static addEmployeeProfile = async (req, res) => {
         try {
@@ -300,7 +302,189 @@ class EmployeeController {
             return res.status(500).json({message: 'Error!'})
         }
     }
+
+
+    static addEmployeeFamily = async (req, res) => {
+        try {
+            
+            const employee_id = req.body.employee_id
+            const name = req.body.name
+            const identifier = req.body.identifier
+            const job = req.body.job
+            const placeOfBirth = req.body.placeOfBirth
+            const dateOfBirth = new Date(req.body.dateOfBirth)
+            const religion = req.body.religion
+            const is_life = req.body.is_life
+            const is_divorced = req.body.is_divorced
+            const relation_status = req.body.relation_status
+            const created_by = req.body.created_by
+            const created_at = new Date()
+
+            // check if religion valid or not
+            const validReligion = ValidatorService.enumReligionValidator(religion)
+            if (!validReligion) {
+                return res.status(400).json({message: `Data Agama yang anda masukan tidak valid!`})
+            }
+
+            // check if relation valid or not
+            const validRelation = ValidatorService.enumRelationValidator(relation_status)
+            if (!validRelation) {
+                return res.status(400).json({message: `Data Relasi yang anda masukan tidak valid!`})
+            }
+
+            // insert to table employee family
+            const employeeData = await EmployeeFamilyModel.create({
+                employee_id,
+                name,
+                identifier,
+                job,
+                place_of_birth: placeOfBirth,
+                date_of_birth: dateOfBirth,
+                religion,
+                is_life,
+                is_divorced,
+                relation_status,
+                created_by,
+                created_at
+            })
+
+            return res.status(201).json({message: `Data Inserted!`, employeeData})
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
+
+    static getAllEmployeeFamily = async (req, res) => {
+        try {
+
+            const employeeData = await EmployeeFamilyModel.findAll({})
+
+            // Check if data exist
+            if (employeeData.length == 0) {
+                return res.status(404).json({message:`Data not Found!`})
+            }
+            else {
+                res.status(200).json({message: 'Data Retrived!', employeeData})
+            }
+            
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
+
+    static getOneEmployeeFamily = async (req, res) => {
+        try {
+
+            const employee_id = req.params.employee_id
+
+            const employeeData = await EmployeeFamilyModel.findAll({where: {employee_id}})
+
+            // Check if data exist
+            if (employeeData.length == 0) {
+                return res.status(404).json({message: `Data not Found!`})
+            }
+            else {
+                return res.status(200).json({message: `Data Retrived!`, employeeData})
+            }
+            
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
+
+    static updateEmployeeFamily = async (req, res) => {
+        try {
+
+            const employee_id = req.params.employee_id
+            const name = req.body.name
+            const identifier = req.body.identifier
+            const job = req.body.job
+            const placeOfBirth = req.body.placeOfBirth
+            const dateOfBirth = new Date(req.body.dateOfBirth)
+            let religion = req.body.religion
+            const is_life = req.body.is_life
+            const is_divorced = req.body.is_divorced
+            let relation_status = req.body.relation_status
+            const updated_by = req.body.updated_by
+            const updated_at = new Date()
+            
+            const employeeData = await EmployeeFamilyModel.findAll({where: {employee_id}})
+
+            // Check if data exist
+            if (employeeData.length == 0) {
+                return res.status(404).json({message: `Data not Found!`})
+            }
+            else {
+                const employeeObj = employeeData[0].get()
+
+                religion = religion ? religion : employeeObj.religion
+                relation_status = relation_status ? relation_status : employeeObj.relation_status
+
+                // check if religion valid or not
+                const validReligion = ValidatorService.enumReligionValidator(religion)
+                if (!validReligion) {
+                    return res.status(400).json({message: `Data Agama yang anda masukan tidak valid!`})
+                }
+
+                // check if relation valid or not
+                const validRelation = ValidatorService.enumRelationValidator(relation_status)
+                if (!validRelation) {
+                    return res.status(400).json({message: `Data Relasi yang anda masukan tidak valid!`})
+                }
+                
+                console.log('Semua data OK');
+
+                const employeeFamilyData = await EmployeeFamilyModel.update({
+                    employee_id,
+                    name: name ? name : employeeObj.name,
+                    identifier: identifier ? identifier: employeeObj.identifier,
+                    job: job ? job : employeeObj.job,
+                    place_of_birth: placeOfBirth ? placeOfBirth : employeeObj.place_of_birth,
+                    date_of_birth: dateOfBirth ? dateOfBirth : employeeObj.date_of_birth,
+                    religion,
+                    is_life: is_life ? is_life : employeeObj.is_life,
+                    is_divorced: is_divorced ? is_divorced : employeeObj.is_divorced,
+                    relation_status,
+                    updated_by,
+                    updated_at
+                }, {where: {employee_id}})
     
+                return res.status(201).json({message: `Data Updated!`, employeeFamilyData})
+            }
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
+    
+    static deleteEmployeeFamily = async (req, res) => {
+        try {
+
+            const employee_id = req.params.employee_id
+
+            const employeeData = await EmployeeFamilyModel.findAll({where: {employee_id}})
+
+            // Check if data exist
+            if (employeeData.length == 0) {
+                return res.status(404).json({message: `Data not Found!`})
+            }
+            else {
+                const deleteEmployeeFamilyData = await EmployeeFamilyModel.destroy({where:{employee_id}})
+
+                return res.status(200).json({message:'Data Deleted!', deleteEmployeeFamilyData})
+            }
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
+
 }
 
 module.exports = EmployeeController

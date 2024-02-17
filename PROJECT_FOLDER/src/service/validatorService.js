@@ -45,6 +45,44 @@ class ValidatorService {
         }
     }
 
+    static enumReligionValidator = (value) => {
+        if (value == 'Islam') {
+            return value
+        }
+        else if (value == 'Katolik') {
+            return value
+        }
+        else if (value == 'Buda') {
+            return value
+        }
+        else if (value == 'Protestan') {
+            return value
+        }
+        else if (value == 'Konghucu') {
+            return value
+        }
+        else {
+            return false
+        }
+    }
+    
+    static enumRelationValidator = (value) => {
+        if (value == 'Suami') {
+            return value
+        }
+        else if (value == 'Istri') {
+            return value
+        }
+        else if (value == 'Anak') {
+            return value
+        }
+        else if (value == 'Anak Sambung') {
+            return value
+        }
+        else {
+            return false
+        }
+    }
 
 }
 
