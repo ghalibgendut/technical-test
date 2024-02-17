@@ -16,7 +16,7 @@ const EmployeeProfileModel = db.define('employee_profile', {
         }
     },
     place_of_birth: Sequelize.STRING,
-    date_of_birth: Sequelize.STRING,
+    date_of_birth: Sequelize.DATE,
     gender: Sequelize.ENUM('Laki-laki', 'Perempuan'),
     is_married: Sequelize.BOOLEAN,
     prof_pict: Sequelize.STRING(255),

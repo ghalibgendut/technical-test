@@ -33,6 +33,18 @@ class ValidatorService {
         }
     }
 
+    static enumGenderValidator = (value) => {
+        if(value == 'Laki-laki') {
+            return value
+        }
+        else if (value == 'Perempuan') {
+            return value
+        }
+        else {
+            return false
+        }
+    }
+
 
 }
 

@@ -1,7 +1,7 @@
 {
     "development": {
         "username": "postgres",
-        "password": "root",
+        "password": "postgres",
         "database": "data_kepegawaian",
         "host": "localhost",
         "dialect": "postgres"

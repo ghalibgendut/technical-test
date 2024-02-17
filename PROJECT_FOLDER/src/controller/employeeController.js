@@ -1,6 +1,12 @@
 const EmployeeModel = require('../model/employee_model')
+const EmployeeProfileModel = require('../model/employee_profile_model')
 const Sequelize = require('sequelize')
 const moment = require('moment')
+const path = require('path')
+const sharp = require('sharp')
+const filePath = path.join(__dirname, '../../assets')
+const ValidatorService = require('../service/validatorService')
+
 
 class EmployeeController {
 
@@ -142,6 +148,159 @@ class EmployeeController {
             return res.status(500).json({message: 'Error!'})
         }
     }
+
+    static addEmployeeProfile = async (req, res) => {
+        try {
+
+            const employee_id = req.body.employee_id
+            let fileName = req.file.filename
+            const path = `/assets/${fileName}` //used to store in db
+            const placeOfBirth = req.body.placeOfBirth
+            const dateOfBirth = new Date(req.body.dateOfBirth)
+            const gender = req.body.gender
+            const is_married = req.body.is_married
+            const created_by = req.body.created_by
+            const created_at = new Date()
+
+
+            // check gender valid or not
+            const validGender = ValidatorService.enumGenderValidator(gender)
+            if (!validGender) {
+                return res.status(400).json({message: `Gender yang anda masukan tidak valid!`})
+            }
+            else {
+
+                // insert to employee tabel
+                const employeeData = await EmployeeProfileModel.create({
+                    employee_id,
+                    place_of_birth: placeOfBirth,
+                    date_of_birth: dateOfBirth,
+                    gender,
+                    is_married,
+                    prof_pict: path,
+                    created_by,
+                    created_at
+                })
+                return res.status(201).json({message: `Data inserted!`, employeeData})
+            }
+            
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
+
+    static getAllEmployeeProfile = async (req, res) => {
+        try {
+
+            const employeeData = await EmployeeProfileModel.findAll({})
+
+            // Check if data exist
+            if (employeeData.length == 0) {
+                return res.status(404).json({message:`Data not Found!`})
+            }
+            else {
+                res.status(200).json({message: 'Data Retrived!', employeeData})
+            }
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
+
+    static getOneEmployeeProfile = async (req, res) => {
+        try {
+            const employee_id = req.params.employee_id
+
+            const employeeData = await EmployeeProfileModel.findAll({where: {employee_id}})
+
+            // Check if data exist
+            if (employeeData.length == 0) {
+                return res.status(404).json({message:`Data not Found!`})
+            }
+            else {
+                res.status(200).json({message: 'Data Retrived!', employeeData})
+            }
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
+
+    static updateEmployeeProfile = async (req, res) => {
+        try {
+            const employee_id = req.params.employee_id
+            let fileName = req.file.filename
+            const path = `/assets/${fileName}` //used to store in db
+            const placeOfBirth = req.body.placeOfBirth
+            const dateOfBirth = new Date(req.body.dateOfBirth)
+            let gender = req.body.gender
+            const is_married = req.body.is_married
+            const updated_by = req.body.created_at
+            const updated_at = new Date()
+
+            const employeeData = await EmployeeProfileModel.findAll({where:{employee_id}})
+
+            if (employeeData.length == 0) {
+                return res.status(404).json({message: `Data not found!`})
+            }
+            else {
+                const employeeObj = employeeData[0].get()
+                gender = gender ? gender : employeeObj.gender
+
+                // check if gender valid or not
+                const validGender = ValidatorService.enumGenderValidator(gender)
+
+                if (!validGender) {
+                    return res.status(400).json({message: `Gender yang anda masukan tidak valid!`})
+                }
+                else {
+
+                    // console.log(employeeObj);
+                    
+                    // update employee profile table
+                    const employeProfileData = await EmployeeProfileModel.update({
+                        place_of_birth: placeOfBirth ? placeOfBirth : employeeObj.place_of_birth,
+                        date_of_birth: dateOfBirth ? dateOfBirth : employeeObj.date_of_birth,
+                        gender,
+                        is_married,
+                        prof_pict: path,
+                        updated_by,
+                        updated_at
+                    }, {where: {employee_id}})
+
+                    return res.status(200).json({message:`Data updated!`, employeProfileData})
+                }
+            }
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
+
+    static deleteEmployeeProfile = async (req, res) => {
+        try {
+            
+            const employee_id = req.params.employee_id
+
+            const employeeData = await EmployeeProfileModel.findAll({where: {employee_id}})
+
+            // Check if data exist
+            if (employeeData.length == 0) {
+                return res.status(404).json({message: `Data not Found!`})
+            }
+            else {
+                const deleteEmployeeProfileData = await EmployeeProfileModel.destroy({where:{employee_id}})
+
+                return res.status(200).json({message:'Data Deleted!', deleteEmployeeProfileData})
+            }
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({message: 'Error!'})
+        }
+    }
+    
 }
 
 module.exports = EmployeeController
